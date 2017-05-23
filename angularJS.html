@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SMARTASSISTANT Angular JS Exercise</title>
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+
+    <!-- AngularJs app definition -->
+    <script>
+        angular.module('AngularJsExercise.services', []).
+            factory('angularJsServices', function($http) {
+                var advisorAPI = {};
+                    <!-- Returns advisor dummy data  -->
+                    advisorAPI.getAdvisor = function() {
+                        var currentTimeStamp = new Date().getTime();
+
+                        return  {
+                            name : "SmartAssistantSampleAdvisor",
+                            pages: [
+                                {
+                                    id: 1,
+                                    pageNum: 0,
+                                    pageText: "First Page",
+                                    questions: [
+                                        {
+                                            id: 11,
+                                            questionText: "I am looking for a new printer for...",
+                                            questionType: "RADIO_BUTTONS",
+                                            mandatory: true
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: 2,
+                                    pageNum: 1,
+                                    pageText: "Second Page",
+                                    questions: [
+                                        {
+                                            id: 22,
+                                            questionText: "Printer should have..",
+                                            questionType: "CHECKBOX",
+                                            mandatory: false
+                                        },
+                                        {
+                                            id: 22,
+                                            questionText: "What color ?",
+                                            questionType: "CHECKBOX",
+                                            mandatory: false
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: 3,
+                                    pageNum: 2,
+                                    pageText: "Third Page",
+                                    questions: [
+                                        {
+                                            id: 33,
+                                            questionText: "I am looking for a new printer for...",
+                                            questionType: "RADIO_BUTTONS",
+                                            mandatory: true
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: 4,
+                                    pageNum: 3,
+                                    pageText: "Fourth Page",
+                                    questions: [
+                                        {
+                                            id: 44,
+                                            questionText: "Price range",
+                                            questionType: "SINGLE_SLIDER",
+                                            mandatory: false
+                                        },
+                                        {
+                                            id: 444,
+                                            questionText: "Printer size",
+                                            questionType: "DOUBLE_SLIDER",
+                                            mandatory: false
+                                        }
+                                    ]
+                                }
+                            ]
+                        };
+                    };
+
+                return advisorAPI;
+            });
+
+        angular.module('AngularJsExercise.controllers', []).
+            controller('angularJsExerciseController', function($scope, angularJsServices) {
+                $scope.advisor = angularJsServices.getAdvisor();
+            });
+
+        angular.module('AngularJsExercise.filters', [])
+            .filter('angularJsExerciseFilter', function() {
+                <!-- implement me -->
+                return function( pages ){
+                  let newPages = [];
+                  for (var i = 0; i < pages.length; i++) {
+                    if( i === 0 ){
+                      pages[i].first = true;
+                    }
+                    if( i === pages.length - 1 ){
+                      pages[i].last = true;
+                    }
+                    if( pages[i].pageNum % 2 === 0 ){
+                      newPages.push( pages[i] )
+                    }
+                  }
+                  return newPages;
+                }
+             });
+
+        angular.module('AngularJsExercise.controllers')
+                .directive('advisorPage', function() {
+                    return {
+                        templateUrl: function( elem, attr ){
+                          return 'advisorPage.template'
+                        }
+                    };
+                });
+
+
+        angular.module('AngularJsExercise', [
+            'AngularJsExercise.services',
+            'AngularJsExercise.controllers',
+            'AngularJsExercise.filters'
+        ]);
+
+    </script>
+
+</head>
+<body>
+
+    <div ng-app="AngularJsExercise" ng-controller="angularJsExerciseController">
+        <!-- display pages with questions -->
+        <div advisor-page ng-repeat = "page in advisor.pages | angularJsExerciseFilter">
+        </div>
+        <!-- advisorPage directive template -->
+        <script type=text/ng-template id=advisorPage.template>
+          <div ng-class="{'smrt42-page smrt42-first-page': page.first, 'smrt42-page smrt42-last-page': page.last, 'smrt42-page': !page.first}">
+            <div class=”smrt42-page-text”>{{ page.pageText }} </div>
+            <div class=”smrt42-page-number” ng-if="page.pageNum + 1 <= 3">{{ page.pageNum }} </div>
+            <div class=”smrt42-page-number” ng-if="page.pageNum + 1 > 3"> greater than 3 </div>
+            <div ng-repeat = "question in page.questions">
+              <div class="smrt42-question" ng-if="quesion.mandatory !== true">
+                <div class="smrt42-question-text">{{ question.questionText }}</div>
+                <div class="smrt42-question-type">{{ question.questionType }}</div>
+              </div>
+              <div class="smrt42-question smrt42-mandatory-question" ng-if="quesion.mandatory = true">
+                <div class="smrt42-question-text">{{ question.questionText }}</div>
+                <div class="smrt42-question-type">{{ question.questionType }}</div>
+              </div>
+            </div>
+          </div>
+        </script>
+    </div>
+
+</body>
+</html>
